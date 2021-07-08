@@ -19,43 +19,26 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+export type Tuple<T, N extends number> = N extends N ? number extends N ? T[] : _TupleOf<T, N, []> : never;
+type _TupleOf<T, N extends number, R extends unknown[]> = R["length"] extends N ? R : _TupleOf<T, N, [T, ...R]>;
+
 /**
- * A function that does nothing
+ *
+ * @param sources The source arrays
+ * @yields A tuple of the next element from each of the sources
+ * @returns The tuple of all the sources as soon as at least one of the sources is exausted
  */
-export function noop<T extends any[]>(...args: T): void {
-  return void args;
+export function* zipStrict<T, N extends number>(...sources: Tuple<T[], N>): Iterator<Tuple<T, N>, Tuple<T[], N>> {
+  const maxSafeLength = sources.reduce((prev, cur) => Math.min(prev, cur.length), Number.POSITIVE_INFINITY);
+
+  if (!isFinite(maxSafeLength)) {
+    // There are no sources, thus just return
+    return [] as Tuple<T[], N>;
+  }
+
+  for (let i = 0; i < maxSafeLength; i += 1) {
+    yield sources.map(source => source[i]) as Tuple<T, N>;
+  }
+
+  return sources.map(source => source.slice(maxSafeLength)) as Tuple<T[], N>;
 }
-
-export * from "./app-version";
-export * from "./autobind";
-export * from "./base64";
-export * from "./camelCase";
-export * from "./cloneJson";
-export * from "./cluster-id-url-parsing";
-export * from "./debouncePromise";
-export * from "./defineGlobal";
-export * from "./delay";
-export * from "./disposer";
-export * from "./downloadFile";
-export * from "./escapeRegExp";
-export * from "./extended-map";
-export * from "./getRandId";
-export * from "./hash-set";
-export * from "./local-kubeconfig";
-export * from "./n-fircate";
-export * from "./openExternal";
-export * from "./paths";
-export * from "./reject-promise";
-export * from "./singleton";
-export * from "./sort-compare";
-export * from "./splitArray";
-export * from "./tar";
-export * from "./toggle-set";
-export * from "./toJS";
-export * from "./type-narrowing";
-export * from "./types";
-
-import * as iter from "./iter";
-import * as array from "./array";
-
-export { iter, array };
