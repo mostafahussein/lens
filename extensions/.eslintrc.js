@@ -19,33 +19,18 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { Hotbar } from "../../common/hotbar-types";
-import { catalogEntityRegistry } from "../../main/catalog";
-import type { MigrationDeclaration } from "../helpers";
-
-export default {
-  version: "5.0.0-beta.5",
-  run(store) {
-    const hotbars: Hotbar[] = store.get("hotbars") ?? [];
-
-    hotbars.forEach((hotbar, hotbarIndex) => {
-      hotbar.items.forEach((item, itemIndex) => {
-        const entity = catalogEntityRegistry.items.find((entity) => entity.metadata.uid === item?.entity.uid);
-
-        if (!entity) {
-          // Clear disabled item
-          hotbars[hotbarIndex].items[itemIndex] = null;
-        } else {
-          // Save additional data
-          hotbars[hotbarIndex].items[itemIndex].entity = {
-            ...item.entity,
-            name: entity.metadata.name,
-            source: entity.metadata.source
-          };
-        }
-      });
-    });
-
-    store.set("hotbars", hotbars);
-  }
-} as MigrationDeclaration;
+module.exports = {
+  "overrides": [
+    {
+      files: [
+        "**/*.ts",
+        "**/*.tsx",
+      ],
+      rules: {
+        "import/no-unresolved": ["error", {
+          ignore: ["@k8slens/extensions"]
+        }],
+      }
+    }
+  ]
+};
