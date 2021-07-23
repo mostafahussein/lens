@@ -20,7 +20,6 @@
  */
 
 import React from "react";
-import { remote } from "electron";
 import { Avatar, IconButton, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, Paper } from "@material-ui/core";
 import { Description, Folder, Delete, HelpOutline } from "@material-ui/icons";
 import { action, computed, observable, reaction, makeObservable } from "mobx";
@@ -33,6 +32,7 @@ import { Spinner } from "../spinner";
 import logger from "../../../main/logger";
 import { iter } from "../../utils";
 import { isWindows } from "../../../common/vars";
+import { dialog } from "../../remote-helpers";
 
 interface SyncInfo {
   type: "file" | "folder" | "unknown";
@@ -110,8 +110,7 @@ export class KubeconfigSyncs extends React.Component {
 
   @action
   async openDialog(message: string, actions: SelectPathOptions) {
-    const { dialog, BrowserWindow } = remote;
-    const { canceled, filePaths } = await dialog.showOpenDialog(BrowserWindow.getFocusedWindow(), {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
       properties: ["showHiddenFiles", "multiSelections", ...actions],
       message,
       buttonLabel: "Sync",

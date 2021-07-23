@@ -25,64 +25,51 @@
   TEST_NAMESPACE namespace. This is done to minimize destructive impact of the cluster tests on an existing minikube
   cluster and vice versa.
 */
-import type { Application } from "spectron";
 import * as utils from "../helpers/utils";
-import { listHelmRepositories } from "../helpers/utils";
-import { fail } from "assert";
 
-jest.setTimeout(2 * 60 * 1000); // 2 minutes so that we can get better errors from spectron
+jest.setTimeout(20_000);
 
-// FIXME (!): improve / simplify all css-selectors + use [data-test-id="some-id"] (already used in some tests below)
-describe("Lens integration tests", () => {
-  let app: Application;
+describe("preferences page tests", () => {
+  it('shows "preferences" and can navigate through the tabs', async () => {
+    const { window, cleanup } = await utils.start();
 
-  describe("app start", () => {
-    utils.beforeAllWrapped(async () => {
-      app = await utils.setup();
-    });
+    try {
+      await utils.clickWelcomeButton(window);
+      await window.keyboard.press("Meta+,");
 
-    utils.afterAllWrapped(() => utils.tearDown(app));
-
-    it('shows "add cluster"', async () => {
-      await app.electron.ipcRenderer.send("test-menu-item-click", "File", "Add Cluster");
-      await app.client.waitUntilTextExists("h2", "Add Clusters from Kubeconfig");
-    });
-
-    describe("preferences page", () => {
-      it('shows "preferences"', async () => {
-        const appName: string = process.platform === "darwin" ? "OpenLens" : "File";
-
-        await app.electron.ipcRenderer.send("test-menu-item-click", appName, "Preferences");
-        await app.client.waitUntilTextExists("[data-testid=application-header]", "Application");
-      });
-
-      it("shows all tabs and their contents", async () => {
-        await app.client.click("[data-testid=application-tab]");
-        await app.client.click("[data-testid=proxy-tab]");
-        await app.client.waitUntilTextExists("[data-testid=proxy-header]", "Proxy");
-        await app.client.click("[data-testid=kube-tab]");
-        await app.client.waitUntilTextExists("[data-testid=kubernetes-header]", "Kubernetes");
-        await app.client.click("[data-testid=telemetry-tab]");
-        await app.client.waitUntilTextExists("[data-testid=telemetry-header]", "Telemetry");
-      });
-
-      it("ensures helm repos", async () => {
-        const repos = await listHelmRepositories();
-
-        if (repos.length === 0) {
-          fail("Lens failed to add any repositories");
-        }
-
-        await app.client.click("[data-testid=kube-tab]");
-        await app.client.waitUntilTextExists("div.repos .repoName", repos[0].name); // wait for the helm-cli to fetch the repo(s)
-        await app.client.click("#HelmRepoSelect"); // click the repo select to activate the drop-down
-        await app.client.waitUntilTextExists("div.Select__option", "");  // wait for at least one option to appear (any text)
-      });
-    });
-
-    it.skip('quits Lens"', async () => {
-      await app.client.keys(["Meta", "Q"]);
-      await app.client.keys("Meta");
-    });
+      await window.waitForSelector("[data-testid=application-header] >> text=Application");
+      await window.click("[data-testid=proxy-tab]");
+      await window.waitForSelector("[data-testid=proxy-header] >> text=Proxy");
+      await window.click("[data-testid=kube-tab]");
+      await window.waitForSelector("[data-testid=kubernetes-header] >> text=Kubernetes");
+      await window.click("[data-testid=telemetry-tab]");
+      await window.waitForSelector("[data-testid=telemetry-header] >> text=Telemetry");
+    } finally {
+      await cleanup();
+    }
   });
+
+  it("ensures helm repos", async () => {
+    const repos = await utils.listHelmRepositories();
+
+    if (repos.length === 0) {
+      fail("Lens failed to add any repositories");
+    }
+
+    const { window, cleanup } = await utils.start();
+
+    try {
+      await utils.clickWelcomeButton(window);
+      await window.keyboard.press("Meta+,");
+
+      await window.click("[data-testid=kube-tab]");
+      await window.waitForSelector(`div.repos .repoName >> text=${repos[0].name}`, {
+        timeout: 100_000,
+      });
+      await window.click("#HelmRepoSelect");
+      await window.waitForSelector("div.Select__option");
+    } finally {
+      await cleanup();
+    }
+  }, 120_000);
 });

@@ -87,6 +87,7 @@ export class WindowManager extends Singleton {
           nodeIntegration: true,
           nodeIntegrationInSubFrames: true,
           enableRemoteModule: true,
+          contextIsolation: false,
         },
       });
       this.windowState.manage(this.mainWindow);
@@ -225,7 +226,10 @@ export class WindowManager extends Singleton {
         resizable: false,
         show: false,
         webPreferences: {
-          nodeIntegration: true
+          nodeIntegration: true,
+          enableRemoteModule: true,
+          contextIsolation: false,
+          nodeIntegrationInSubFrames: true,
         }
       });
       await this.splashWindow.loadURL("static://splash.html");

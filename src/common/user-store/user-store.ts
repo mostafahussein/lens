@@ -19,7 +19,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { app, remote } from "electron";
+import { app } from "electron";
 import semver from "semver";
 import { action, computed, observable, reaction, makeObservable } from "mobx";
 import { BaseStore } from "../base-store";
@@ -32,6 +32,7 @@ import { fileNameMigration } from "../../migrations/user-store";
 import { ObservableToggleSet, toJS } from "../../renderer/utils";
 import { DESCRIPTORS, KubeconfigSyncValue, UserPreferencesModel } from "./preferences-helpers";
 import logger from "../../main/logger";
+import { getPath } from "../utils/getPath";
 
 export interface UserStoreModel {
   lastSeenAppVersion: string;
@@ -214,5 +215,5 @@ export class UserStore extends BaseStore<UserStoreModel> /* implements UserStore
  * @returns string
  */
 export function getDefaultKubectlPath(): string {
-  return path.join((app || remote.app).getPath("userData"), "binaries");
+  return path.join(getPath("userData"), "binaries");
 }

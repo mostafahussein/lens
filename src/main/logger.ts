@@ -19,9 +19,9 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { app, remote } from "electron";
 import winston from "winston";
 import Transport from "winston-transport";
+import { getPath } from "../common/utils/getPath";
 import { isDebugging, isTestEnv } from "../common/vars";
 import { LEVEL } from "triple-beam";
 import { Severity } from "@sentry/browser";
@@ -103,7 +103,7 @@ if (!isTestEnv) {
     handleExceptions: false,
     level: logLevel,
     filename: "lens.log",
-    dirname: (app ?? remote?.app)?.getPath("logs"),
+    dirname: getPath("logs"),
     maxsize: 16 * 1024,
     maxFiles: 16,
     tailable: true,
