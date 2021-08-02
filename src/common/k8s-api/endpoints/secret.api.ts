@@ -21,7 +21,7 @@
 
 import { KubeObject } from "../kube-object";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { autoBind } from "../../../renderer/utils";
+import { autoBind } from "../../utils";
 import { KubeApi } from "../kube-api";
 
 export enum SecretType {

@@ -22,7 +22,7 @@
 import moment from "moment";
 
 import { IAffinity, WorkloadKubeObject } from "../workload-kube-object";
-import { autoBind } from "../../../renderer/utils";
+import { autoBind } from "../../utils";
 import { KubeApi } from "../kube-api";
 import { metricsApi } from "./metrics.api";
 import type { IPodMetrics } from "./pods.api";

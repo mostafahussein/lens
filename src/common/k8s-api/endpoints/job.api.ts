@@ -20,7 +20,7 @@
  */
 
 import get from "lodash/get";
-import { autoBind } from "../../../renderer/utils";
+import { autoBind } from "../../utils";
 import { IAffinity, WorkloadKubeObject } from "../workload-kube-object";
 import { KubeApi } from "../kube-api";
 import { metricsApi } from "./metrics.api";

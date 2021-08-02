@@ -22,7 +22,7 @@
 import type { ClusterContext } from "./cluster-context";
 
 import { action, computed, makeObservable, observable, reaction, when } from "mobx";
-import { autoBind, noop, rejectPromiseBy } from "../../renderer/utils";
+import { autoBind, noop, rejectPromiseBy } from "../utils";
 import { KubeObject, KubeStatus } from "./kube-object";
 import type { IKubeWatchEvent } from "./kube-watch-api";
 import { ItemStore } from "../item.store";
