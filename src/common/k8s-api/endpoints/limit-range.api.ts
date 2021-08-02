@@ -21,7 +21,7 @@
 
 import { KubeObject } from "../kube-object";
 import { KubeApi } from "../kube-api";
-import { autoBind } from "../../../renderer/utils";
+import { autoBind } from "../../utils";
 import type { KubeJsonApiData } from "../kube-json-api";
 
 export enum LimitType {

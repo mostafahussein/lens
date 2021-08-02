@@ -20,7 +20,7 @@
  */
 
 import { KubeObject } from "../kube-object";
-import { autoBind } from "../../../renderer/utils";
+import { autoBind } from "../../utils";
 import { IMetrics, metricsApi } from "./metrics.api";
 import type { Pod } from "./pods.api";
 import { KubeApi } from "../kube-api";

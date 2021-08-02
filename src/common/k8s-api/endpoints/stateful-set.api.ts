@@ -21,7 +21,7 @@
 
 import get from "lodash/get";
 import { IAffinity, WorkloadKubeObject } from "../workload-kube-object";
-import { autoBind } from "../../../renderer/utils";
+import { autoBind } from "../../utils";
 import { KubeApi } from "../kube-api";
 import { metricsApi } from "./metrics.api";
 import type { IPodContainer, IPodMetrics } from "./pods.api";
