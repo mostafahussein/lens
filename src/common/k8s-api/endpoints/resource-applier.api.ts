@@ -22,7 +22,7 @@
 import jsYaml from "js-yaml";
 import { KubeObject } from "../kube-object";
 import type { KubeJsonApiData } from "../kube-json-api";
-import { apiBase } from "../../../renderer/api/index";
+import { apiBase } from "../index";
 import { apiManager } from "../api-manager";
 
 export const resourceApplierApi = {

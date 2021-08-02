@@ -22,7 +22,7 @@
 // Metrics api
 
 import moment from "moment";
-import { apiBase } from "../../../renderer/api/index";
+import { apiBase } from "../index";
 import type { IMetricsQuery } from "../../../main/routes/metrics-route";
 
 export interface IMetrics {

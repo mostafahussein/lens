@@ -22,7 +22,7 @@
 import jsYaml from "js-yaml";
 import { autoBind, formatDuration } from "../../utils";
 import capitalize from "lodash/capitalize";
-import { apiBase } from "../../../renderer/api/index";
+import { apiBase } from "../index";
 import { helmChartStore } from "../../../renderer/components/+apps-helm-charts/helm-chart.store";
 import type { ItemObject } from "../../item.store";
 import { KubeObject } from "../kube-object";

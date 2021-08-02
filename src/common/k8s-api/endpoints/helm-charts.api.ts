@@ -20,7 +20,7 @@
  */
 
 import { compile } from "path-to-regexp";
-import { apiBase } from "../../../renderer/api/index";
+import { apiBase } from "../index";
 import { stringify } from "querystring";
 import { autoBind } from "../../../renderer/utils";
 
