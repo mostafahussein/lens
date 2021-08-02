@@ -30,7 +30,7 @@ import { jobStore } from "../+workloads-jobs/job.store";
 import { Link } from "react-router-dom";
 import { cronJobStore } from "./cronjob.store";
 import { getDetailsUrl, KubeObjectDetailsProps } from "../kube-object";
-import type { CronJob, Job } from "../../api/endpoints";
+import type { CronJob, Job } from "../../../common/k8s-api/endpoints";
 import { KubeObjectMeta } from "../kube-object/kube-object-meta";
 
 interface Props extends KubeObjectDetailsProps<CronJob> {

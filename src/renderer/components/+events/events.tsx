@@ -28,14 +28,14 @@ import { orderBy } from "lodash";
 import { TabLayout } from "../layout/tab-layout";
 import { EventStore, eventStore } from "./event.store";
 import { getDetailsUrl, KubeObjectListLayout, KubeObjectListLayoutProps } from "../kube-object";
-import type { KubeEvent } from "../../api/endpoints/events.api";
+import type { KubeEvent } from "../../../common/k8s-api/endpoints/events.api";
 import type { TableSortCallbacks, TableSortParams } from "../table";
 import type { HeaderCustomizer } from "../item-object-list";
 import { Tooltip } from "../tooltip";
 import { Link } from "react-router-dom";
 import { cssNames, IClassName, stopPropagation } from "../../utils";
 import { Icon } from "../icon";
-import { lookupApiLink } from "../../api/kube-api";
+import { lookupApiLink } from "../../../common/k8s-api/kube-api";
 import { eventsURL } from "../../../common/routes";
 
 enum columnId {
@@ -133,7 +133,7 @@ export class Events extends React.Component<Props> {
           tooltip={`Limited to ${store.limit}`}
         />
       </>,
-      title, 
+      title,
       ...headerPlaceholders
     };
   };

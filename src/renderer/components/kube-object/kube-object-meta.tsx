@@ -20,9 +20,9 @@
  */
 
 import React from "react";
-import type { KubeMetaField, KubeObject } from "../../api/kube-object";
+import type { KubeMetaField, KubeObject } from "../../../common/k8s-api/kube-object";
 import { DrawerItem, DrawerItemLabels } from "../drawer";
-import { lookupApiLink } from "../../api/kube-api";
+import { lookupApiLink } from "../../../common/k8s-api/kube-api";
 import { Link } from "react-router-dom";
 import { KubeObjectStatusIcon } from "../kube-object-status-icon";
 import { LocaleDate } from "../locale-date";

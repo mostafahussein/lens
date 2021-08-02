@@ -20,8 +20,8 @@
  */
 
 import React from "react";
-import type * as endpoints from "../api/endpoints";
-import type { KubeObject } from "../api/kube-object";
+import type * as endpoints from "../../common/k8s-api/endpoints";
+import type { KubeObject } from "../../common/k8s-api/kube-object";
 import { KubeObjectDetailRegistry } from "../api/kube-object-detail-registry";
 import { HpaDetails } from "../components/+config-autoscalers";
 import { LimitRangeDetails } from "../components/+config-limit-ranges";
@@ -55,7 +55,7 @@ import { PodDetails } from "../components/+workloads-pods";
 import { ReplicaSetDetails } from "../components/+workloads-replicasets";
 import { StatefulSetDetails } from "../components/+workloads-statefulsets";
 import type { KubeObjectDetailsProps } from "../components/kube-object";
-import type { CustomResourceDefinition } from "../api/endpoints";
+import type { CustomResourceDefinition } from "../../common/k8s-api/endpoints";
 
 export function intiKubeObjectDetailRegistry() {
   KubeObjectDetailRegistry.getInstance()

@@ -27,7 +27,7 @@ import { Link, RouteComponentProps } from "react-router-dom";
 import { getDetailsUrl, KubeObjectListLayout } from "../kube-object";
 import { stopPropagation } from "../../utils";
 import { volumesStore } from "./volumes.store";
-import { pvcApi, storageClassApi } from "../../api/endpoints";
+import { pvcApi, storageClassApi } from "../../../common/k8s-api/endpoints";
 import { KubeObjectStatusIcon } from "../kube-object-status-icon";
 import type { VolumesRouteParams } from "../../../common/routes";
 

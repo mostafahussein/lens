@@ -23,10 +23,10 @@ import "./endpoint-subset-list.scss";
 
 import React from "react";
 import { observer } from "mobx-react";
-import { EndpointSubset, Endpoint, EndpointAddress} from "../../api/endpoints";
+import { EndpointSubset, Endpoint, EndpointAddress} from "../../../common/k8s-api/endpoints";
 import { Table, TableCell, TableHead, TableRow } from "../table";
 import { boundMethod } from "../../utils";
-import { lookupApiLink } from "../../api/kube-api";
+import { lookupApiLink } from "../../../common/k8s-api/kube-api";
 import { Link } from "react-router-dom";
 import { getDetailsUrl } from "../kube-object";
 

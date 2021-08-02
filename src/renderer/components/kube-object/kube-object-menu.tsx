@@ -21,11 +21,11 @@
 
 import React from "react";
 import { boundMethod, cssNames } from "../../utils";
-import type { KubeObject } from "../../api/kube-object";
+import type { KubeObject } from "../../../common/k8s-api/kube-object";
 import { editResourceTab } from "../dock/edit-resource.store";
 import { MenuActions, MenuActionsProps } from "../menu/menu-actions";
 import { hideDetails } from "./kube-object-details";
-import { apiManager } from "../../api/api-manager";
+import { apiManager } from "../../../common/k8s-api/api-manager";
 import { KubeObjectMenuRegistry } from "../../../extensions/registries/kube-object-menu-registry";
 
 export interface KubeObjectMenuProps<T> extends MenuActionsProps {
@@ -85,7 +85,7 @@ export class KubeObjectMenu<T extends KubeObject> extends React.Component<KubeOb
 
   getMenuItems(): React.ReactChild[] {
     const { object, toolbar } = this.props;
-    
+
     if (!object) {
       return [];
     }

@@ -32,7 +32,7 @@ import type { KubeObjectDetailsProps } from "../kube-object";
 import { crdStore } from "./crd.store";
 import { KubeObjectMeta } from "../kube-object/kube-object-meta";
 import { Input } from "../input";
-import type { AdditionalPrinterColumnsV1, CustomResourceDefinition } from "../../api/endpoints/crd.api";
+import type { AdditionalPrinterColumnsV1, CustomResourceDefinition } from "../../../common/k8s-api/endpoints/crd.api";
 import { parseJsonPath } from "../../utils/jsonPath";
 
 interface Props extends KubeObjectDetailsProps<CustomResourceDefinition> {
