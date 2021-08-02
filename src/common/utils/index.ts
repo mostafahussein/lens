@@ -52,6 +52,8 @@ export * from "./tar";
 export * from "./toggle-set";
 export * from "./toJS";
 export * from "./type-narrowing";
+export * from "./convertMemory";
+export * from "./convertCpu";
 
 import * as iter from "./iter";
 
