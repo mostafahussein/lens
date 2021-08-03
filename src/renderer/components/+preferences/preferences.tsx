@@ -42,6 +42,8 @@ import { KubeconfigSyncs } from "./kubeconfig-syncs";
 import { SettingLayout } from "../layout/setting-layout";
 import { Checkbox } from "../checkbox";
 import { sentryDsn } from "../../../common/vars";
+import { defaultBaseRegistryUrl } from "../+extensions";
+import { Checkbox as MuiCheckbox } from "../mui/checkbox";
 
 enum Pages {
   Application = "application",
@@ -56,6 +58,7 @@ enum Pages {
 export class Preferences extends React.Component {
   @observable httpProxy = UserStore.getInstance().httpsProxy || "";
   @observable shell = UserStore.getInstance().shell || "";
+  @observable extensionRegistryUrl = "";
   @observable activeTab = Pages.Application;
 
   constructor(props: {}) {
@@ -127,6 +130,7 @@ export class Preferences extends React.Component {
   }
 
   render() {
+    const userStore = UserStore.getInstance();
     const extensions = AppPreferenceRegistry.getInstance().getItems();
     const telemetryExtensions = extensions.filter(e => e.showInPreferencesTab == Pages.Telemetry);
     const defaultShell = process.env.SHELL
@@ -167,6 +171,32 @@ export class Preferences extends React.Component {
                 onChange={v => this.shell = v}
                 onBlur={() => UserStore.getInstance().shell = this.shell}
               />
+            </section>
+
+            <hr/>
+
+            <section id="registry">
+              <SubTitle title="Extension registry"/>
+              <FormSwitch
+                control={
+                  <MuiCheckbox
+                    checked={userStore.getUseConfiguredExtensionRegistryUrl}
+                    indeterminate={typeof userStore.extensionRegistryUrl === "string"}
+                    onChange={(event, checked) => userStore.extensionRegistryUrl = checked}
+                  />
+                }
+                label="Use .npmrc configuration"
+              />
+              <Input
+                theme="round-black"
+                placeholder={defaultBaseRegistryUrl}
+                value={this.extensionRegistryUrl}
+                onChange={v => this.extensionRegistryUrl = v}
+                onBlur={() => userStore.extensionRegistryUrl = this.extensionRegistryUrl}
+              />
+              <small className="hint">
+                The registry URL for installing extensions by name.
+              </small>
             </section>
 
             <hr/>
