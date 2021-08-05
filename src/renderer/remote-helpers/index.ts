@@ -19,4 +19,6 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-export * as dialog from "./dialog";
+import * as dialog from "./dialog";
+
+export { dialog };
