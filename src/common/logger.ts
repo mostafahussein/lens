@@ -36,11 +36,12 @@ if (ipcMain) {
     format: winston.format.combine(
       winston.format.colorize({ level: true, message: false}),
       winston.format.padLevels(),
+      winston.format.ms(),
       consoleFormat({
         showMeta: true,
         inspectOptions: {
           depth: 4,
-          colors: false,
+          colors: true,
           maxArrayLength: 10,
           breakLength: 120,
           compact: Infinity,
