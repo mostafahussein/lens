@@ -21,6 +21,17 @@
 
 const packageJson = require("./package.json");
 const isInVscode = Boolean(process.env.VSCODE_PID);
+const isInGitHubActions = Boolean(process.env.GITHUB_ACTIONS);
+
+const noCycleMaxDepth = (
+  isInVscode
+    ? 10 // very fast for editors
+    : (
+      isInGitHubActions
+        ? undefined // on CI check everything
+        : 30 // somewhat fast for local lint running
+    )
+);
 
 module.exports = {
   ignorePatterns: [
@@ -120,7 +131,7 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": "off",
         "import/no-cycle": [2, {
           ignoreExternal: true,
-          maxDepth: isInVscode ? 10 : undefined, // This should speed up VScode locally
+          maxDepth: noCycleMaxDepth,
         }],
         "unused-imports/no-unused-imports-ts": "error",
         "unused-imports/no-unused-vars-ts": [
@@ -194,8 +205,7 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": "off",
         "import/no-cycle": [2, {
           ignoreExternal: true,
-          // The following should speed up VScode but running `yarn lint` manually or in CI will still completely ban it
-          maxDepth: isInVscode ? 10 : undefined,
+          maxDepth: noCycleMaxDepth,
         }],
         "unused-imports/no-unused-imports-ts": "error",
         "unused-imports/no-unused-vars-ts": [
