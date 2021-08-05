@@ -23,6 +23,7 @@ import { KubeObject } from "../kube-object";
 import { autoBind, unitsToBytes } from "../../utils";
 import { KubeApi } from "../kube-api";
 import type { KubeJsonApiData } from "../kube-json-api";
+import { isClusterPageContext } from "../../cluster-store";
 
 export interface PersistentVolume {
   spec: {
@@ -101,6 +102,14 @@ export class PersistentVolume extends KubeObject {
   }
 }
 
-export const persistentVolumeApi = new KubeApi({
-  objectConstructor: PersistentVolume,
-});
+let persistentVolumeApi: KubeApi<PersistentVolume>;
+
+if (isClusterPageContext()) {
+  persistentVolumeApi = new KubeApi({
+    objectConstructor: PersistentVolume,
+  });
+}
+
+export {
+  persistentVolumeApi
+};

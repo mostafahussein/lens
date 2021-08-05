@@ -48,6 +48,8 @@ export class ApiManager {
   }
 
   registerApi(apiBase: string, api: KubeApi<KubeObject>) {
+    if (!api.apiBase) return;
+
     if (!this.apis.has(apiBase)) {
       this.stores.forEach((store) => {
         if (store.api === api) {
@@ -83,8 +85,8 @@ export class ApiManager {
 
   @action
   registerStore(store: KubeObjectStore<KubeObject>, apis: KubeApi<KubeObject>[] = [store.api]) {
-    apis.forEach(api => {
-      this.stores.set(api.apiBase, store);
+    apis.filter(Boolean).forEach(api => {
+      if (api.apiBase) this.stores.set(api.apiBase, store);
     });
   }
 

@@ -291,3 +291,12 @@ export function getHostedClusterId() {
 export function getHostedCluster(): Cluster {
   return ClusterStore.getInstance().getById(getHostedClusterId());
 }
+
+/**
+ * Returns true only if code is running within a cluster iframe context
+ */
+export function isClusterPageContext(): boolean {
+  if (typeof window === "undefined") return false;
+
+  return !!getClusterIdFromHost(window.location.host);
+}

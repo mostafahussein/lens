@@ -22,6 +22,7 @@
 import { KubeObject } from "../kube-object";
 import { KubeApi } from "../kube-api";
 import { crdResourcesURL } from "../../routes";
+import { isClusterPageContext } from "../../cluster-store";
 
 type AdditionalPrinterColumnsCommon = {
   name: string;
@@ -174,7 +175,18 @@ export class CustomResourceDefinition extends KubeObject {
   }
 }
 
-export const crdApi = new KubeApi<CustomResourceDefinition>({
-  objectConstructor: CustomResourceDefinition,
-  checkPreferredVersion: true,
-});
+/**
+ * Only available within kubernetes cluster pages
+ */
+let crdApi: KubeApi<CustomResourceDefinition>;
+
+if (isClusterPageContext()) {
+  crdApi = new KubeApi<CustomResourceDefinition>({
+    objectConstructor: CustomResourceDefinition,
+    checkPreferredVersion: true,
+  });
+}
+
+export {
+  crdApi
+};

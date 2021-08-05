@@ -23,6 +23,7 @@ import { autoBind } from "../../utils";
 import { KubeObject } from "../kube-object";
 import { KubeApi } from "../kube-api";
 import type { KubeJsonApiData } from "../kube-json-api";
+import { isClusterPageContext } from "../../cluster-store";
 
 export interface PodDisruptionBudget {
   spec: {
@@ -72,6 +73,14 @@ export class PodDisruptionBudget extends KubeObject {
 
 }
 
-export const pdbApi = new KubeApi({
-  objectConstructor: PodDisruptionBudget,
-});
+let pdbApi: KubeApi<PodDisruptionBudget>;
+
+if (isClusterPageContext()) {
+  pdbApi = new KubeApi({
+    objectConstructor: PodDisruptionBudget,
+  });
+}
+
+export {
+  pdbApi
+};

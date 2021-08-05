@@ -29,6 +29,8 @@ import { ItemStore } from "../item.store";
 import { apiManager } from "./api-manager";
 import { ensureObjectSelfLink, IKubeApiQueryParams, KubeApi, parseKubeApi } from "./kube-api";
 import type { KubeJsonApiData } from "./kube-json-api";
+import type { RequestInit } from "node-fetch";
+import AbortController from "abort-controller";
 
 export interface KubeObjectStoreLoadingParams<K extends KubeObject> {
   namespaces: string[];
@@ -345,7 +347,7 @@ export abstract class KubeObjectStore<T extends KubeObject> extends ItemStore<T>
     const { signal } = abortController;
 
     const callback = (data: IKubeWatchEvent<T>, error: any) => {
-      if (!this.isLoaded || error instanceof DOMException) return;
+      if (!this.isLoaded || error?.type === "aborted") return;
 
       if (error instanceof Response) {
         if (error.status === 404 || error.status === 401) {

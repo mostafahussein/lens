@@ -89,6 +89,7 @@ export class LensProxy extends Singleton {
           });
 
           this.port = port;
+          process.env.LENS_PROXY_PORT = port.toString();
           resolve();
         })
         .once("error", (error) => {
