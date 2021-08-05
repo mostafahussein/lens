@@ -22,10 +22,8 @@
 import moment from "moment-timezone";
 import path from "path";
 import os from "os";
-import type { ThemeId } from "../../renderer/theme.store";
+import { ThemeStore } from "../../renderer/theme.store";
 import { ObservableToggleSet } from "../utils";
-
-export const defaultThemeName: ThemeId = "lens-dark";
 
 export interface KubeconfigSyncEntry extends KubeconfigSyncValue {
   filePath: string;
@@ -58,10 +56,10 @@ const shell: PreferenceDescription<string | undefined> = {
 
 const colorTheme: PreferenceDescription<string> = {
   fromStore(val) {
-    return val || defaultThemeName;
+    return val || ThemeStore.defaultTheme;
   },
   toStore(val) {
-    if (!val || val === defaultThemeName) {
+    if (!val || val === ThemeStore.defaultTheme) {
       return undefined;
     }
 

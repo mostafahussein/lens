@@ -40,7 +40,6 @@ export class ClusterStore extends BaseStore<ClusterStoreModel> {
   private static StateChannel = "cluster:state";
 
   clusters = observable.map<ClusterId, Cluster>();
-  removedClusters = observable.map<ClusterId, Cluster>();
 
   protected disposer = disposer();
 
@@ -142,35 +141,19 @@ export class ClusterStore extends BaseStore<ClusterStoreModel> {
 
   @action
   protected fromStore({ clusters = [] }: ClusterStoreModel = {}) {
-    const currentClusters = new Map(this.clusters);
-    const newClusters = new Map<ClusterId, Cluster>();
-    const removedClusters = new Map<ClusterId, Cluster>();
-
     // update new clusters
     for (const clusterModel of clusters) {
       try {
-        let cluster = currentClusters.get(clusterModel.id);
-
-        if (cluster) {
-          cluster.updateModel(clusterModel);
+        if (this.clusters.has(clusterModel.id)) {
+          this.clusters.get(clusterModel.id).updateModel(clusterModel);
         } else {
-          cluster = new Cluster(clusterModel);
+          this.clusters.set(clusterModel.id, new Cluster(clusterModel));
         }
-        newClusters.set(clusterModel.id, cluster);
       } catch (error) {
         logger.warn(`[CLUSTER-STORE]: Failed to update/create a cluster: ${error}`);
+        this.clusters.delete(clusterModel.id);
       }
     }
-
-    // update removed clusters
-    currentClusters.forEach(cluster => {
-      if (!newClusters.has(cluster.id)) {
-        removedClusters.set(cluster.id, cluster);
-      }
-    });
-
-    this.clusters.replace(newClusters);
-    this.removedClusters.replace(removedClusters);
   }
 
   toJSON(): ClusterStoreModel {
