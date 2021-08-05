@@ -124,8 +124,6 @@ export class JsonApi<D = JsonApiData, P extends JsonApiParams = JsonApiParams> {
     const reqInit: RequestInit = merge({}, this.reqInit, init);
     const { data, query } = params || {} as P;
 
-    console.log("init", init);
-
     if (data && !reqInit.body) {
       reqInit.body = JSON.stringify(data);
     }
@@ -197,11 +195,7 @@ export class JsonApi<D = JsonApiData, P extends JsonApiParams = JsonApiParams> {
   protected writeLog(log: JsonApiLog) {
     if (!this.config.debug) return;
     const { method, reqUrl, ...params } = log;
-    // let textStyle = "font-weight: bold;";
 
-    // if (params.data) textStyle += "background: green; color: white;";
-    // if (params.error) textStyle += "background: red; color: white;";
-    //console.log(`%c${method} ${reqUrl}`, textStyle, params);
     logger.info(`[JSON-API] request ${method} ${reqUrl}`, params);
   }
 }
