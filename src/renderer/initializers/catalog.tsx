@@ -32,13 +32,13 @@ import { WeblinkAddCommand } from "../components/catalog-entities/weblink-add-co
 import { CommandOverlay } from "../components/command-palette";
 import { Notifications } from "../components/notifications";
 import { loadConfigFromString } from "../../common/kube-helpers";
-import { ConfirmDialog } from "../components/confirm-dialog";
 import { requestMain } from "../../common/ipc";
 import { clusterClearDeletingHandler, clusterDeleteHandler, clusterSetDeletingHandler } from "../../common/cluster-ipc";
-import { iter } from "../utils";
-import { Select } from "../components/select";
+import { ControlFlow } from "../utils";
 import { HotbarStore } from "../../common/hotbar-store";
 import type { ClusterId } from "../../common/cluster-types";
+import type { Cluster } from "../../main/cluster";
+import { deleteClusterConfirmDialog } from "../components/dialog/delete-cluster-dialog";
 
 function initWebLinks() {
   WebLinkCategory.onAdd = () => CommandOverlay.open(<WeblinkAddCommand />);
@@ -65,6 +65,53 @@ export function initCatalog() {
   initKubernetesClusters();
 }
 
+async function setDeleting(cluster: Cluster): Promise<ControlFlow> {
+  await requestMain(clusterSetDeletingHandler, cluster.id);
+
+  try {
+    await fs.promises.access(cluster.kubeConfigPath, fs.constants.W_OK | fs.constants.R_OK);
+  } catch {
+    await requestMain(clusterClearDeletingHandler, cluster.id);
+
+    Notifications.error(
+      <p>Cannot remove cluster, missing write permissions for <code>{cluster.kubeConfigPath}</code></p>
+    );
+
+    return ControlFlow.Stop;
+  }
+
+  return ControlFlow.Continue;
+}
+
+async function aquireConfigLock(cluster: Cluster, lockFilePath: string): Promise<ControlFlow> {
+  try {
+    const fd = await fs.promises.open(lockFilePath, "wx");
+
+    await fd.close(); // close immeditaly as we will want to delete the file later
+  } catch (error) {
+    await requestMain(clusterClearDeletingHandler, cluster.id);
+    console.warn("[KUBERNETES-CLUSTER]: failed to lock config file", error);
+
+    switch (error.code) {
+      case "EEXIST":
+      case "EISDIR":
+        Notifications.error("Cannot remove cluster, failed to aquire lock file. Already held.");
+        break;
+      case "EPERM":
+      case "EACCES":
+        Notifications.error("Cannot remove cluster, failed to aquire lock file. Permission denied.");
+        break;
+      default:
+        Notifications.error(`Cannot remove cluster, failed to aquire lock file. ${error}`);
+        break;
+    }
+
+    return ControlFlow.Stop;
+  }
+
+  return ControlFlow.Continue;
+}
+
 export async function deleteLocalCluster(clusterId: ClusterId): Promise<void> {
   appEventBus.emit({ name: "cluster", action: "remove" });
   const cluster = ClusterStore.getInstance().getById(clusterId);
@@ -73,38 +120,16 @@ export async function deleteLocalCluster(clusterId: ClusterId): Promise<void> {
     return console.warn("[KUBERNETES-CLUSTER]: cannot delete cluster, does not exist in store", { clusterId });
   }
 
-  await requestMain(clusterSetDeletingHandler, clusterId);
-
-  try {
-    await fs.promises.access(cluster.kubeConfigPath, fs.constants.W_OK | fs.constants.R_OK);
-  } catch {
-    await requestMain(clusterClearDeletingHandler, clusterId);
-
-    return void Notifications.error(
-      <p>Cannot remove cluster, missing write permissions for <code>{cluster.kubeConfigPath}</code></p>
-    );
+  switch (await setDeleting(cluster)) {
+    case ControlFlow.Stop:
+      return;
   }
 
   const lockFilePath = `${path.resolve(cluster.kubeConfigPath)}.lock`;
 
-  try {
-    const fd = await fs.promises.open(lockFilePath, "wx");
-
-    await fd.close(); // close immeditaly as we will want to delete the file later
-  } catch (error) {
-    await requestMain(clusterClearDeletingHandler, clusterId);
-    console.warn("[KUBERNETES-CLUSTER]: failed to lock config file", error);
-
-    switch (error.code) {
-      case "EEXIST":
-      case "EISDIR":
-        return void Notifications.error("Cannot remove cluster, failed to aquire lock file. Already held.");
-      case "EPERM":
-      case "EACCES":
-        return void Notifications.error("Cannot remove cluster, failed to aquire lock file. Permission denied.");
-      default:
-        return void Notifications.error(`Cannot remove cluster, failed to aquire lock file. ${error}`);
-    }
+  switch (await aquireConfigLock(cluster, lockFilePath)) {
+    case ControlFlow.Stop:
+      return;
   }
 
   try {
@@ -114,50 +139,17 @@ export async function deleteLocalCluster(clusterId: ClusterId): Promise<void> {
       throw error;
     }
 
-    const contextNames = new Set(config.getContexts().map(({ name }) => name));
+    const [cf, selectedOption] = await deleteClusterConfirmDialog({ config, cluster });
 
-    contextNames.delete(cluster.contextName);
+    switch (cf) {
+      case ControlFlow.Stop:
+        return void await requestMain(clusterClearDeletingHandler, cluster.id);
+    }
 
-    if (config.currentContext === cluster.contextName && contextNames.size > 0) {
-      const options = [
-        {
-          label: "--unset current-context--",
-          value: false,
-        },
-        ...iter.map(contextNames, name => ({
-          label: name,
-          value: name,
-        })),
-      ];
-      let selectedOption: string | false = false;
-      const didConfirm = await ConfirmDialog.confirm({
-        labelOk: "Select context",
-        message: (
-          <>
-            <p>
-              The context you are deleting is the <code>current-context</code> in the <code>{cluster.kubeConfigPath}</code> file.
-              Please select one of the other contexts to replace it with.
-            </p>
-            <br />
-            <Select
-              options={options}
-              onChange={({ value }) => selectedOption = value}
-              themeName="light"
-            />
-          </>
-        )
-      });
-
-      if (!didConfirm) {
-        return void await requestMain(clusterClearDeletingHandler, clusterId);
-      }
-
-      if (selectedOption === false) {
-        config.setCurrentContext(undefined);
-      } else {
-        config.setCurrentContext(selectedOption);
-      }
-
+    if (selectedOption === false) {
+      config.setCurrentContext(undefined);
+    } else {
+      config.setCurrentContext(selectedOption);
     }
 
     config.contexts = config.contexts.filter(context => context.name !== cluster.contextName);
@@ -167,6 +159,7 @@ export async function deleteLocalCluster(clusterId: ClusterId): Promise<void> {
     await fs.promises.writeFile(tmpFilePath, config.exportConfig());
     await fs.promises.rename(tmpFilePath, cluster.kubeConfigPath);
     await requestMain(clusterDeleteHandler, clusterId);
+    HotbarStore.getInstance().removeAllHotbarItems(clusterId);
   } catch (error) {
     await requestMain(clusterClearDeletingHandler, clusterId);
     console.warn("[KUBERNETES-CLUSTER]: failed to read or parse kube config file", error);
@@ -174,7 +167,5 @@ export async function deleteLocalCluster(clusterId: ClusterId): Promise<void> {
     return void Notifications.error(`Cannot remove cluster, failed to process config file. ${error}`);
   } finally {
     await fs.promises.unlink(lockFilePath); // always unlink the file
-
-    HotbarStore.getInstance().removeAllHotbarItems(clusterId);
   }
 }
