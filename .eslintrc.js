@@ -20,18 +20,14 @@
  */
 
 const packageJson = require("./package.json");
-const isInVscode = Boolean(process.env.VSCODE_PID);
-const isInGitHubActions = Boolean(process.env.GITHUB_ACTIONS);
 
-const noCycleMaxDepth = (
-  isInVscode
-    ? 10 // very fast for editors
-    : (
-      isInGitHubActions
-        ? undefined // on CI check everything
-        : 30 // somewhat fast for local lint running
-    )
-);
+function noCycleMaxDepth() {
+  return (
+    process.env.VSCODE_PID && !process.env.GITHUB_ACTIONS && !process.env.LENS_LINT_FULL
+      ? 10 // very fast for editors and default `make lint`
+      : undefined // no fast for CI
+  );
+}
 
 module.exports = {
   ignorePatterns: [
@@ -131,7 +127,7 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": "off",
         "import/no-cycle": [2, {
           ignoreExternal: true,
-          maxDepth: noCycleMaxDepth,
+          maxDepth: noCycleMaxDepth(),
         }],
         "unused-imports/no-unused-imports-ts": "error",
         "unused-imports/no-unused-vars-ts": [
@@ -205,7 +201,7 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": "off",
         "import/no-cycle": [2, {
           ignoreExternal: true,
-          maxDepth: noCycleMaxDepth,
+          maxDepth: noCycleMaxDepth(),
         }],
         "unused-imports/no-unused-imports-ts": "error",
         "unused-imports/no-unused-vars-ts": [
