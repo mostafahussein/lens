@@ -82,7 +82,6 @@ export function initIpcMainHandlers() {
       return;
     }
 
-    appEventBus.emit({ name: "cluster", action: "delete_frame" });
     cluster.disconnect();
     clusterFrameMap.delete(cluster.id);
   });

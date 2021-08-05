@@ -25,7 +25,7 @@ import path from "path";
 import tempy from "tempy";
 import "../../common/catalog-entities/kubernetes-cluster";
 import { WebLinkCategory } from "../../common/catalog-entities";
-import { ClusterId, ClusterStore } from "../../common/cluster-store";
+import { ClusterStore } from "../../common/cluster-store";
 import { appEventBus } from "../../common/event-bus";
 import { catalogCategoryRegistry } from "../api/catalog-category-registry";
 import { WeblinkAddCommand } from "../components/catalog-entities/weblink-add-command";
@@ -38,6 +38,7 @@ import { clusterClearDeletingHandler, clusterDeleteHandler, clusterSetDeletingHa
 import { iter } from "../utils";
 import { Select } from "../components/select";
 import { HotbarStore } from "../../common/hotbar-store";
+import type { ClusterId } from "../../common/cluster-types";
 
 function initWebLinks() {
   WebLinkCategory.onAdd = () => CommandOverlay.open(<WeblinkAddCommand />);
