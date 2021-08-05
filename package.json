@@ -246,6 +246,7 @@
     "uuid": "^8.3.2",
     "win-ca": "^3.2.0",
     "winston": "^3.3.3",
+    "winston-console-format": "^1.0.8",
     "winston-transport-browserconsole": "^1.0.5",
     "ws": "^7.4.6"
   },
